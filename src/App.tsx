@@ -12,6 +12,10 @@ export const App = () => {
   const users: User[] = usersFromServer;
   const [currentOption, setCurrentOption] = useState(0);
   const [title, setTitle] = useState('');
+  const [errorObj, setErrorObj] = useState({
+    titleInput: false,
+    nameInput: false,
+  });
   const isSubmitEnabled = title.trim() && currentOption;
 
   return (
@@ -33,6 +37,20 @@ export const App = () => {
             userId: currentOption,
           };
 
+          if (!title.trim()) {
+            setErrorObj(prevState => ({
+              ...prevState,
+              titleInput: true,
+            }));
+          }
+
+          if (!currentOption) {
+            setErrorObj(prevState => ({
+              ...prevState,
+              nameInput: true,
+            }));
+          }
+
           if (isSubmitEnabled) {
             setTodos(prevState => [...prevState, newTodo]);
             setTitle('');
@@ -44,13 +62,19 @@ export const App = () => {
           <input
             type="text"
             data-cy="titleInput"
-            placeholder='Enter title here'
+            placeholder="Enter title here"
             value={title}
-            onChange={e => {
-              setTitle(e.target.value);
+            onChange={event => {
+              setTitle(event.target.value);
+              setErrorObj(prevState => ({
+                ...prevState,
+                titleInput: false,
+              }));
             }}
           />
-          {title === '' && <span className="error">Please enter a title</span>}
+          {title === '' && errorObj.titleInput && (
+            <span className="error">Please enter a title</span>
+          )}
         </div>
 
         <div className="field">
@@ -59,6 +83,10 @@ export const App = () => {
             value={currentOption}
             onChange={event => {
               setCurrentOption(+event.target.value);
+              setErrorObj(prevState => ({
+                ...prevState,
+                nameInput: false,
+              }));
             }}
           >
             <option value="0" disabled>
@@ -70,15 +98,12 @@ export const App = () => {
               </option>
             ))}
           </select>
-          {currentOption === 0 && (
+          {currentOption === 0 && errorObj.nameInput && (
             <span className="error">Please choose a user</span>
           )}
         </div>
 
-        <button
-          type="submit"
-          data-cy="submitButton"
-        >
+        <button type="submit" data-cy="submitButton">
           Add
         </button>
       </form>
