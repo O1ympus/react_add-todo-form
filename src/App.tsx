@@ -6,9 +6,15 @@ import { Todo } from './interfaces/Todo';
 import { TodoList } from './components/TodoList';
 import { User } from './interfaces/User';
 import { useState } from 'react';
+import { findUserById } from './utils/findUserById';
 
 export const App = () => {
-  const [todos, setTodos] = useState<Todo[]>(todosFromServer);
+  const [todos, setTodos] = useState<Todo[]>(
+    todosFromServer.map(todo => ({
+      ...todo,
+      user: findUserById(todo.userId),
+    })),
+  );
   const users: User[] = usersFromServer;
   const [currentOption, setCurrentOption] = useState(0);
   const [title, setTitle] = useState('');
@@ -35,6 +41,7 @@ export const App = () => {
             title: title,
             completed: false,
             userId: currentOption,
+            user: findUserById(currentOption),
           };
 
           if (!title.trim()) {
